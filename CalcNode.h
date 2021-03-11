@@ -18,13 +18,13 @@ public:
 
     void setPhi(double p);
 
-    const vector3D getLoc();
+    vector3D getLoc() const;
 
-    const vector3D getE();
+    vector3D getE() const;
 
-    const vector3D getB();
+    vector3D getB() const;
 
-    const double getPhi();
+    double getPhi() const;
 
 private:
     vector3D loc;

@@ -12,18 +12,18 @@ void CalcNode::setPhi(double p) {
     phi = p;
 }
 
-const vector3D CalcNode::getLoc() {
+vector3D CalcNode::getLoc() const {
     return loc;
 }
 
-const vector3D CalcNode::getE() {
+vector3D CalcNode::getE() const {
     return E;
 }
 
-const vector3D CalcNode::getB() {
+vector3D CalcNode::getB() const {
     return B;
 }
 
-const double CalcNode::getPhi() {
+double CalcNode::getPhi() const {
     return phi;
 }

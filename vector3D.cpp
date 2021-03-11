@@ -16,6 +16,10 @@ double vector3D::getZ() const {
     return z;
 }
 
+double vector3D::magnitude() const {
+    return sqrt(x * x + y * y + z * z);
+}
+
 void vector3D::setX(double _x) {
     x = _x;
 }

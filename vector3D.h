@@ -1,6 +1,8 @@
 #ifndef LINAL_VECTOR3D_H
 #define LINAL_VECTOR3D_H
 
+#include <cmath>
+
 class vector3D {
 public:
     vector3D() : x(0), y(0), z(0) {}
@@ -14,6 +16,8 @@ public:
     double getY() const;
 
     double getZ() const;
+
+    double magnitude() const;
 
     void setX(double _x);
 
@@ -48,5 +52,8 @@ private:
     double x, y, z;
 };
 
+vector3D operator*(double a, const vector3D &v);
+
+vector3D crossProduct(const vector3D &v1, const vector3D &v2)
 
 #endif //LINAL_VECTOR3D_H
