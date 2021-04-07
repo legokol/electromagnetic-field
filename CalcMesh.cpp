@@ -33,41 +33,38 @@ CalcMesh::CalcMesh(unsigned int sizeX, unsigned int sizeY, unsigned int sizeZ, d
 }
 
 void CalcMesh::calculate(const ConductorElement &element) {
-    std::ofstream out("Field.txt");
-    //cout << "Calculation started" << endl;
     for (unsigned int i = 0; i < nodes.size(); ++i) {
         for (unsigned int j = 0; j < nodes[i].size(); ++j) {
             for (unsigned int k = 0; k < nodes[i][j].size(); ++k) {
                 vector3D r = nodes[i][j][k].getLoc() - element.getLoc();
                 if (abs(r.getX()) > 0 || abs(r.getY()) > 0 || abs(r.getZ()) > 0) {
-                    vector3D E = element.calculateE(r);
-                    if (E.magnitude() > 1)
-                        out << r.magnitude() << ' ' << E.magnitude() << std::endl;
                     nodes[i][j][k].setE(element.calculateE(r));
-                    //nodes[i][I][k].setB(element.calculateB(r));
+                    nodes[i][j][k].setB(element.calculateB(r));
                     nodes[i][j][k].setPhi(element.calculatePhi(r));
                 }
             }
-            /*cout << "Nodes calculated " << (i + 1) * (I + 1) * nodes[i][I].size() << '/'
-                 << nodes.size() * nodes[0].size() * nodes[0][0].size() << endl;*/
+            cout << "Nodes calculated: " << (i + 1) * nodes[0].size() * nodes[0][0].size() << " out of "
+                 << nodes.size() * nodes[0].size() * nodes[0][0].size() << endl;
         }
     }
 }
 
 void CalcMesh::calculate(const vector<ConductorElement> &conductor) {
-    for (unsigned int s = 0; s < conductor.size(); ++s) {
-        for (unsigned int i = 0; i < nodes.size(); ++i) {
-            for (unsigned int j = 0; j < nodes[i].size(); ++j) {
-                for (unsigned int k = 0; k < nodes[i][j].size(); ++k) {
+    for (unsigned int i = 0; i < nodes.size(); ++i) {
+        for (unsigned int j = 0; j < nodes[i].size(); ++j) {
+            for (unsigned int k = 0; k < nodes[i][j].size(); ++k) {
+                for (unsigned int s = 0; s < conductor.size(); ++s) {
                     vector3D r = nodes[i][j][k].getLoc() - conductor[s].getLoc();
                     if (abs(r.getX()) > 0 || abs(r.getY()) > 0 || abs(r.getZ()) > 0) {
                         nodes[i][j][k].setE(nodes[i][j][k].getE() + conductor[s].calculateE(r));
-                        //nodes[i][I][k].setB(conductor[s].calculateB(r));
+                        nodes[i][j][k].setB(nodes[i][j][k].getB() + conductor[s].calculateB(r));
                         nodes[i][j][k].setPhi(nodes[i][j][k].getPhi() + conductor[s].calculatePhi(r));
                     }
                 }
             }
         }
+        cout << "Nodes calculated: " << (i + 1) * nodes[0].size() * nodes[0][0].size() << " out of "
+             << nodes.size() * nodes[0].size() * nodes[0][0].size() << endl;
     }
 }
 
@@ -101,9 +98,9 @@ void CalcMesh::snapshot(std::string name) const {
     E->SetNumberOfComponents(3);
 
     // Индукция магнитного поля
-    /*auto B = vtkSmartPointer<vtkDoubleArray>::New();
+    auto B = vtkSmartPointer<vtkDoubleArray>::New();
     B->SetName("B");
-    B->SetNumberOfComponents(3);*/
+    B->SetNumberOfComponents(3);
 
     // Градиент потенциала
     auto grad = vtkSmartPointer<vtkDoubleArray>::New();
@@ -126,14 +123,14 @@ void CalcMesh::snapshot(std::string name) const {
                 vector3D vE = nodes[i][j][k].getE();
                 vector3D vGrad = nodes[i][j][k].getGrad();
                 vector3D vDiff = vE + vGrad;
-                //vector3D vB = nodes[i][I][k].getB();
+                vector3D vB = nodes[i][j][k].getB();
                 points->InsertNextPoint(r.getX(), r.getY(), r.getZ());
 
                 double _E[3] = {vE.getX(), vE.getY(), vE.getZ()};
                 E->InsertNextTuple(_E);
 
-                /*double _B[3] = {vB.getX(), vB.getY(), vB.getZ()};
-                B->InsertNextTuple(_B);*/
+                double _B[3] = {vB.getX(), vB.getY(), vB.getZ()};
+                B->InsertNextTuple(_B);
 
                 phi->InsertNextValue(nodes[i][j][k].getPhi());
 
@@ -144,6 +141,8 @@ void CalcMesh::snapshot(std::string name) const {
                 diff->InsertNextTuple(_diff);
             }
         }
+        cout << "Nodes saved: " << (i + 1) * nodes[0].size() * nodes[0][0].size() << " out of "
+             << nodes.size() * nodes[0].size() * nodes[0][0].size() << endl;
     }
 
     // Размер и точки сетки
@@ -152,7 +151,7 @@ void CalcMesh::snapshot(std::string name) const {
 
     // Прикрепление данных
     structuredGrid->GetPointData()->AddArray(E);
-    //structuredGrid->GetPointData()->AddArray(B);
+    structuredGrid->GetPointData()->AddArray(B);
     structuredGrid->GetPointData()->AddArray(phi);
     structuredGrid->GetPointData()->AddArray(grad);
     structuredGrid->GetPointData()->AddArray(diff);

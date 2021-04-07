@@ -26,7 +26,8 @@ vector3D ConductorElement::calculateE(const vector3D &r) const {
 }
 
 vector3D ConductorElement::calculateB(const vector3D &r) const {
-    return vector3D();
+    double l = r.magnitude();
+    return (1e-7 / (l * l * l)) * crossProduct(I, r);
 }
 
 double ConductorElement::calculatePhi(const vector3D &r) const {

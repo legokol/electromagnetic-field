@@ -89,6 +89,8 @@ vector3D operator*(double a, const vector3D &v) {
 }
 
 vector3D crossProduct(const vector3D &v1, const vector3D &v2) {
-    return vector3D(v1.getY() * v2.getZ() - v1.getZ() * v2.getY(), v1.getZ() * v2.getX() - v1.getX() * v2.getZ(),
-                    v1.getX() * v2.getY() - v1.getY() * v2.getX());
+    double x = v1.getY() * v2.getZ() - v2.getY() * v1.getZ();
+    double y = v1.getZ() * v2.getX() - v2.getZ() * v1.getX();
+    double z = v1.getX() * v2.getY() - v2.getX() * v1.getY();
+    return vector3D(x, y, z);
 }
