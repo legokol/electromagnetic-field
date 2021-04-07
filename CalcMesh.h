@@ -32,7 +32,7 @@ public:
     void calculateGrad();
 
     // Сохраняем для просмотра
-    void snapshot() const;
+    void snapshot(std::string name) const;
 
 private:
     vector<vector<vector<CalcNode>>> nodes;

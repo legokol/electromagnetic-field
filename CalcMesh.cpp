@@ -85,7 +85,7 @@ void CalcMesh::calculateGrad() {
     }
 }
 
-void CalcMesh::snapshot() const {
+void CalcMesh::snapshot(std::string name) const {
     // Сетка в терминах VTK
     vtkSmartPointer<vtkStructuredGrid> structuredGrid = vtkSmartPointer<vtkStructuredGrid>::New();
     // Точки сетки в терминах VTK
@@ -159,7 +159,7 @@ void CalcMesh::snapshot() const {
 
     // Записываем
     vtkSmartPointer<vtkXMLStructuredGridWriter> writer = vtkSmartPointer<vtkXMLStructuredGridWriter>::New();
-    std::string fileName = "field.vts";
+    std::string fileName = name;
     writer->SetFileName(fileName.c_str());
     writer->SetInputData(structuredGrid);
     writer->Write();

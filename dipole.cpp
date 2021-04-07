@@ -12,7 +12,7 @@ int main() {
     mesh.calculate(dipole);
     mesh.calculateGrad();
     cout << "Calculation finished, starting saving" << endl;
-    mesh.snapshot();
+    mesh.snapshot("dipole.vts");
     cout << "Saving finished" << endl;
     return 0;
 }
