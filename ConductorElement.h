@@ -23,7 +23,7 @@ public:
 
     vector3D calculateB(const vector3D &r) const;
 
-    double caculatePhi(const vector3D &r) const;
+    double calculatePhi(const vector3D &r) const;
 
 private:
     vector3D loc;

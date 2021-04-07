@@ -54,6 +54,6 @@ private:
 
 vector3D operator*(double a, const vector3D &v);
 
-vector3D crossProduct(const vector3D &v1, const vector3D &v2)
+vector3D crossProduct(const vector3D &v1, const vector3D &v2);
 
 #endif //LINAL_VECTOR3D_H

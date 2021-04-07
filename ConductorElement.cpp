@@ -21,15 +21,15 @@ double ConductorElement::getQ() const {
 }
 
 vector3D ConductorElement::calculateE(const vector3D &r) const {
-    vector3D d = r - loc;
-    vector3D E = (q / pow(d.magnitude(), 3)) * d;
-    return E;
+    double l = r.magnitude();
+    return (q / (l * l * l)) * r;
 }
 
 vector3D ConductorElement::calculateB(const vector3D &r) const {
     return vector3D();
 }
 
-double ConductorElement::caculatePhi(const vector3D &r) const {
-    return q / (r - loc).magnitude();
+double ConductorElement::calculatePhi(const vector3D &r) const {
+    double l = r.magnitude();
+    return q / l;
 }
