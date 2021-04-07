@@ -1,7 +1,7 @@
 #include "ConductorElement.h"
 
-void ConductorElement::setJ(const vector3D &j_) {
-    j = j_;
+void ConductorElement::setI(const vector3D &I_) {
+    I = I_;
 }
 
 void ConductorElement::setQ(double q_) {
@@ -12,8 +12,8 @@ vector3D ConductorElement::getLoc() const {
     return loc;
 }
 
-vector3D ConductorElement::getJ() const {
-    return j;
+vector3D ConductorElement::getI() const {
+    return I;
 }
 
 double ConductorElement::getQ() const {
@@ -22,7 +22,7 @@ double ConductorElement::getQ() const {
 
 vector3D ConductorElement::calculateE(const vector3D &r) const {
     double l = r.magnitude();
-    return (q / (l * l * l)) * r;
+    return (9e9 * q / (l * l * l)) * r;
 }
 
 vector3D ConductorElement::calculateB(const vector3D &r) const {
@@ -31,5 +31,5 @@ vector3D ConductorElement::calculateB(const vector3D &r) const {
 
 double ConductorElement::calculatePhi(const vector3D &r) const {
     double l = r.magnitude();
-    return q / l;
+    return 9e9 * q / l;
 }

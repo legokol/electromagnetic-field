@@ -5,17 +5,17 @@
 
 class ConductorElement {
 public:
-    ConductorElement(const vector3D &loc_) : loc(loc_), j(), q(0) {}
+    ConductorElement(const vector3D &loc_) : loc(loc_), I(), q(0) {}
 
-    ConductorElement(const vector3D &loc_, const vector3D &j_, double q_) : loc(loc_), j(j_), q(q_) {}
+    ConductorElement(const vector3D &loc_, const vector3D &I_, double q_) : loc(loc_), I(I_), q(q_) {}
 
-    void setJ(const vector3D &j_);
+    void setI(const vector3D &I_);
 
     void setQ(double q_);
 
     vector3D getLoc() const;
 
-    vector3D getJ() const;
+    vector3D getI() const;
 
     double getQ() const;
 
@@ -27,7 +27,7 @@ public:
 
 private:
     vector3D loc;
-    vector3D j; // Плотность тока
+    vector3D I; // Произведение силы тока на вектор направления
     double q; // Заряд
 };
 
