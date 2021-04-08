@@ -170,31 +170,39 @@ void CalcMesh::snapshot(std::string name, const vector<ConductorElement> &conduc
     vtkSmartPointer<vtkPoints> conductor_points = vtkSmartPointer<vtkPoints>::New();
 
     // Ток
-    auto I = vtkSmartPointer<vtkDoubleArray>::New();
-    I->SetName("I");
-    I->SetNumberOfComponents(3);
+    auto conductor_I = vtkSmartPointer<vtkDoubleArray>::New();
+    conductor_I->SetName("I");
+    conductor_I->SetNumberOfComponents(3);
 
     auto conductor_E = vtkSmartPointer<vtkDoubleArray>::New();
     conductor_E->SetName("E");
     conductor_E->SetNumberOfComponents(3);
 
+    auto conductor_B = vtkSmartPointer<vtkDoubleArray>::New();
+    conductor_B->SetName("B");
+    conductor_B->SetNumberOfComponents(3);
+
     for (int i = 0; i < conductor.size(); ++i) {
         vector3D r = conductor[i].getLoc();
-        vector3D vI = conductor[i].getI();
+        vector3D I = conductor[i].getI();
 
         conductor_points->InsertNextPoint(r.getX(), r.getY(), r.getZ());
 
-        double _I[3] = {vI.getX(), vI.getY(), vI.getZ()};
-        I->InsertNextTuple(_I);
+        double _I[3] = {I.getX(), I.getY(), I.getZ()};
+        conductor_I->InsertNextTuple(_I);
 
         double _E[3] = {0, 0, 0};
         conductor_E->InsertNextTuple(_E);
+
+        double _B[3] = {0, 0, 0};
+        conductor_B->InsertNextTuple(_B);
     }
 
     // Создание сетки для проводника
     conductor_mesh->SetPoints(conductor_points);
-    conductor_mesh->GetPointData()->AddArray(I);
+    conductor_mesh->GetPointData()->AddArray(conductor_I);
     conductor_mesh->GetPointData()->AddArray(conductor_E);
+    conductor_mesh->GetPointData()->AddArray(conductor_B);
 
     unsigned int sizeX = nodes.size();
     unsigned int sizeY = nodes[0].size();
@@ -207,14 +215,14 @@ void CalcMesh::snapshot(std::string name, const vector<ConductorElement> &conduc
 
 
     // Напряжённость электростатического поля
-    auto E = vtkSmartPointer<vtkDoubleArray>::New();
-    E->SetName("E");
-    E->SetNumberOfComponents(3);
+    auto mesh_E = vtkSmartPointer<vtkDoubleArray>::New();
+    mesh_E->SetName("E");
+    mesh_E->SetNumberOfComponents(3);
 
     // Индукция магнитного поля
-    auto B = vtkSmartPointer<vtkDoubleArray>::New();
-    B->SetName("B");
-    B->SetNumberOfComponents(3);
+    auto mesh_B = vtkSmartPointer<vtkDoubleArray>::New();
+    mesh_B->SetName("B");
+    mesh_B->SetNumberOfComponents(3);
 
     auto mesh_I = vtkSmartPointer<vtkDoubleArray>::New();
     mesh_I->SetName("I");
@@ -224,16 +232,16 @@ void CalcMesh::snapshot(std::string name, const vector<ConductorElement> &conduc
         for (unsigned int j = 0; j < sizeY; ++j) {
             for (unsigned int k = 0; k < sizeZ; ++k) {
                 vector3D r = nodes[i][j][k].getLoc();
-                vector3D vE = nodes[i][j][k].getE();
-                vector3D vB = nodes[i][j][k].getB();
+                vector3D E = nodes[i][j][k].getE();
+                vector3D B = nodes[i][j][k].getB();
 
                 mesh_points->InsertNextPoint(r.getX(), r.getY(), r.getZ());
 
-                double _E[3] = {vE.getX(), vE.getY(), vE.getZ()};
-                E->InsertNextTuple(_E);
+                double _E[3] = {E.getX(), E.getY(), E.getZ()};
+                mesh_E->InsertNextTuple(_E);
 
-                double _B[3] = {vB.getX(), vB.getY(), vB.getZ()};
-                B->InsertNextTuple(_B);
+                double _B[3] = {B.getX(), B.getY(), B.getZ()};
+                mesh_B->InsertNextTuple(_B);
 
                 double _I[3] = {0, 0, 0};
                 mesh_I->InsertNextTuple(_I);
@@ -244,12 +252,12 @@ void CalcMesh::snapshot(std::string name, const vector<ConductorElement> &conduc
     }
 
     // Размер и точки сетки
-    //mesh->SetDimensions(sizeX, sizeY, sizeZ);
+    mesh->SetDimensions(sizeX, sizeY, sizeZ);
     mesh->SetPoints(mesh_points);
 
     // Прикрепление данных
-    mesh->GetPointData()->AddArray(E);
-    mesh->GetPointData()->AddArray(B);
+    mesh->GetPointData()->AddArray(mesh_E);
+    mesh->GetPointData()->AddArray(mesh_B);
     mesh->GetPointData()->AddArray(mesh_I);
 
     vtkSmartPointer<vtkAppendFilter> append = vtkSmartPointer<vtkAppendFilter>::New();
