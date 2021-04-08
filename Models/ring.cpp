@@ -16,7 +16,7 @@ int main() {
     mesh.calculate(ring);
     mesh.calculateGrad();
     cout << "Calculation finished, starting saving" << endl;
-    mesh.snapshot("ring.vts");
+    mesh.snapshot("ring.vtu", ring);
     cout << "Saving finished" << endl;
     return 0;
 }

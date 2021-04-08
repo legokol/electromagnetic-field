@@ -5,6 +5,8 @@
 
 class ConductorElement {
 public:
+    ConductorElement() : loc(), I(), q(0) {}
+
     ConductorElement(const vector3D &loc_) : loc(loc_), I(), q(0) {}
 
     ConductorElement(const vector3D &loc_, const vector3D &I_, double q_) : loc(loc_), I(I_), q(q_) {}

@@ -10,7 +10,10 @@
 #include <vtkPointData.h>
 #include <vtkXMLStructuredGridWriter.h>
 #include <vtkStructuredGrid.h>
+#include <vtkXMLUnstructuredGridWriter.h>
+#include <vtkUnstructuredGrid.h>
 #include <vtkSmartPointer.h>
+#include <vtkAppendFilter.h>
 
 using std::vector;
 
@@ -33,6 +36,9 @@ public:
 
     // Сохраняем для просмотра
     void snapshot(std::string name) const;
+
+    // Сохраняем вместе с объектом
+    void snapshot(std::string name, const vector<ConductorElement> &conductor) const;
 
 private:
     vector<vector<vector<CalcNode>>> nodes;

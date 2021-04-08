@@ -83,6 +83,10 @@ void CalcMesh::calculateGrad() {
 }
 
 void CalcMesh::snapshot(std::string name) const {
+    unsigned int sizeX = nodes.size();
+    unsigned int sizeY = nodes[0].size();
+    unsigned int sizeZ = nodes[0][0].size();
+
     // Сетка в терминах VTK
     vtkSmartPointer<vtkStructuredGrid> structuredGrid = vtkSmartPointer<vtkStructuredGrid>::New();
     // Точки сетки в терминах VTK
@@ -111,10 +115,6 @@ void CalcMesh::snapshot(std::string name) const {
     auto diff = vtkSmartPointer<vtkDoubleArray>::New();
     diff->SetName("diff");
     diff->SetNumberOfComponents(3);
-
-    unsigned int sizeX = nodes.size();
-    unsigned int sizeY = nodes[0].size();
-    unsigned int sizeZ = nodes[0][0].size();
 
     for (unsigned int i = 0; i < sizeX; ++i) {
         for (unsigned int j = 0; j < sizeY; ++j) {
@@ -161,5 +161,106 @@ void CalcMesh::snapshot(std::string name) const {
     std::string fileName = name;
     writer->SetFileName(fileName.c_str());
     writer->SetInputData(structuredGrid);
+    writer->Write();
+}
+
+void CalcMesh::snapshot(std::string name, const vector<ConductorElement> &conductor) const {
+    // Проводник
+    vtkSmartPointer<vtkUnstructuredGrid> conductor_mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    vtkSmartPointer<vtkPoints> conductor_points = vtkSmartPointer<vtkPoints>::New();
+
+    // Ток
+    auto I = vtkSmartPointer<vtkDoubleArray>::New();
+    I->SetName("I");
+    I->SetNumberOfComponents(3);
+
+    auto conductor_E = vtkSmartPointer<vtkDoubleArray>::New();
+    conductor_E->SetName("E");
+    conductor_E->SetNumberOfComponents(3);
+
+    for (int i = 0; i < conductor.size(); ++i) {
+        vector3D r = conductor[i].getLoc();
+        vector3D vI = conductor[i].getI();
+
+        conductor_points->InsertNextPoint(r.getX(), r.getY(), r.getZ());
+
+        double _I[3] = {vI.getX(), vI.getY(), vI.getZ()};
+        I->InsertNextTuple(_I);
+
+        double _E[3] = {0, 0, 0};
+        conductor_E->InsertNextTuple(_E);
+    }
+
+    // Создание сетки для проводника
+    conductor_mesh->SetPoints(conductor_points);
+    conductor_mesh->GetPointData()->AddArray(I);
+    conductor_mesh->GetPointData()->AddArray(conductor_E);
+
+    unsigned int sizeX = nodes.size();
+    unsigned int sizeY = nodes[0].size();
+    unsigned int sizeZ = nodes[0][0].size();
+
+    // Сетка в терминах VTK
+    vtkSmartPointer<vtkStructuredGrid> mesh = vtkSmartPointer<vtkStructuredGrid>::New();
+    // Точки сетки в терминах VTK
+    vtkSmartPointer<vtkPoints> mesh_points = vtkSmartPointer<vtkPoints>::New();
+
+
+    // Напряжённость электростатического поля
+    auto E = vtkSmartPointer<vtkDoubleArray>::New();
+    E->SetName("E");
+    E->SetNumberOfComponents(3);
+
+    // Индукция магнитного поля
+    auto B = vtkSmartPointer<vtkDoubleArray>::New();
+    B->SetName("B");
+    B->SetNumberOfComponents(3);
+
+    auto mesh_I = vtkSmartPointer<vtkDoubleArray>::New();
+    mesh_I->SetName("I");
+    mesh_I->SetNumberOfComponents(3);
+
+    for (unsigned int i = 0; i < sizeX; ++i) {
+        for (unsigned int j = 0; j < sizeY; ++j) {
+            for (unsigned int k = 0; k < sizeZ; ++k) {
+                vector3D r = nodes[i][j][k].getLoc();
+                vector3D vE = nodes[i][j][k].getE();
+                vector3D vB = nodes[i][j][k].getB();
+
+                mesh_points->InsertNextPoint(r.getX(), r.getY(), r.getZ());
+
+                double _E[3] = {vE.getX(), vE.getY(), vE.getZ()};
+                E->InsertNextTuple(_E);
+
+                double _B[3] = {vB.getX(), vB.getY(), vB.getZ()};
+                B->InsertNextTuple(_B);
+
+                double _I[3] = {0, 0, 0};
+                mesh_I->InsertNextTuple(_I);
+            }
+        }
+        cout << "Nodes saved: " << (i + 1) * nodes[0].size() * nodes[0][0].size() << " out of "
+             << nodes.size() * nodes[0].size() * nodes[0][0].size() << endl;
+    }
+
+    // Размер и точки сетки
+    //mesh->SetDimensions(sizeX, sizeY, sizeZ);
+    mesh->SetPoints(mesh_points);
+
+    // Прикрепление данных
+    mesh->GetPointData()->AddArray(E);
+    mesh->GetPointData()->AddArray(B);
+    mesh->GetPointData()->AddArray(mesh_I);
+
+    vtkSmartPointer<vtkAppendFilter> append = vtkSmartPointer<vtkAppendFilter>::New();
+    append->AddInputData(mesh);
+    append->AddInputData(conductor_mesh);
+    append->Update();
+
+    // Записываем
+    vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+    std::string fileName = name;
+    writer->SetFileName(fileName.c_str());
+    writer->SetInputData(append->GetOutput());
     writer->Write();
 }
