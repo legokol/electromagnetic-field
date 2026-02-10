@@ -7,7 +7,7 @@
 
 class CalcMesh {
 public:
-    // Кубическая сека
+    // Кубическая сетка
     CalcMesh(unsigned int size, double h);
 
     // Сетка в виде произвольного параллелепипеда sizeX x sizeY x sizeZ, шаг везде h

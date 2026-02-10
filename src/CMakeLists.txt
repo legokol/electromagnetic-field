@@ -10,7 +10,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${VTK_LIBRARIES})
 
 target_sources(${PROJECT_NAME} PRIVATE
     Grid.cpp
-    Node.cpp
     ConductorElement.cpp
     vec3.cpp
 )

@@ -49,11 +49,11 @@ void CalcMesh::calculate(const ConductorElement& element) {
     for (unsigned int i = 0; i < nodes.size(); ++i) {
         for (unsigned int j = 0; j < nodes[i].size(); ++j) {
             for (unsigned int k = 0; k < nodes[i][j].size(); ++k) {
-                vec3d r = nodes[i][j][k].getLoc() - element.getLoc();
+                vec3d r = nodes[i][j][k].loc - element.getLoc();
                 if (abs(r.x) > 0 || abs(r.y) > 0 || abs(r.z) > 0) {
-                    nodes[i][j][k].setE(element.calculateE(r));
-                    nodes[i][j][k].setB(element.calculateB(r));
-                    nodes[i][j][k].setPhi(element.calculatePhi(r));
+                    nodes[i][j][k].E   = element.calculateE(r);
+                    nodes[i][j][k].B   = element.calculateB(r);
+                    nodes[i][j][k].phi = element.calculatePhi(r);
                 }
             }
             cout << "Nodes calculated: "
@@ -68,14 +68,14 @@ void CalcMesh::calculate(const std::vector<ConductorElement>& conductor) {
         for (unsigned int j = 0; j < nodes[i].size(); ++j) {
             for (unsigned int k = 0; k < nodes[i][j].size(); ++k) {
                 for (unsigned int s = 0; s < conductor.size(); ++s) {
-                    vec3d r = nodes[i][j][k].getLoc() - conductor[s].getLoc();
+                    vec3d r = nodes[i][j][k].loc - conductor[s].getLoc();
                     if (abs(r.x) > 0 || abs(r.y) > 0 || abs(r.z) > 0) {
-                        nodes[i][j][k].setE(nodes[i][j][k].getE()
-                                            + conductor[s].calculateE(r));
-                        nodes[i][j][k].setB(nodes[i][j][k].getB()
-                                            + conductor[s].calculateB(r));
-                        nodes[i][j][k].setPhi(nodes[i][j][k].getPhi()
-                                              + conductor[s].calculatePhi(r));
+                        nodes[i][j][k].E =
+                            nodes[i][j][k].E + conductor[s].calculateE(r);
+                        nodes[i][j][k].B =
+                            nodes[i][j][k].B + conductor[s].calculateB(r);
+                        nodes[i][j][k].phi =
+                            nodes[i][j][k].phi + conductor[s].calculatePhi(r);
                     }
                 }
             }
@@ -90,15 +90,13 @@ void CalcMesh::calculateGrad() {
     for (unsigned int i = 1; i < nodes.size() - 1; ++i) {
         for (unsigned int j = 1; j < nodes[i].size() - 1; ++j) {
             for (unsigned int k = 1; k < nodes[i][j].size() - 1; ++k) {
-                nodes[i][j][k].setGrad({.x = (nodes[i + 1][j][k].getPhi()
-                                              - nodes[i - 1][j][k].getPhi())
-                                           / (2 * h),
-                                        .y = (nodes[i][j + 1][k].getPhi()
-                                              - nodes[i][j - 1][k].getPhi())
-                                           / (2 * h),
-                                        .z = (nodes[i][j][k + 1].getPhi()
-                                              - nodes[i][j][k - 1].getPhi())
-                                           / (2 * h)});
+                nodes[i][j][k].grad = {
+                    .x = (nodes[i + 1][j][k].phi - nodes[i - 1][j][k].phi)
+                       / (2 * h),
+                    .y = (nodes[i][j + 1][k].phi - nodes[i][j - 1][k].phi)
+                       / (2 * h),
+                    .z = (nodes[i][j][k + 1].phi - nodes[i][j][k - 1].phi)
+                       / (2 * h)};
             }
         }
     }
@@ -142,11 +140,11 @@ void CalcMesh::snapshot(std::string name) const {
     for (unsigned int i = 0; i < nx; ++i) {
         for (unsigned int j = 0; j < ny; ++j) {
             for (unsigned int k = 0; k < nz; ++k) {
-                vec3d r     = nodes[i][j][k].getLoc();
-                vec3d vE    = nodes[i][j][k].getE();
-                vec3d vGrad = nodes[i][j][k].getGrad();
+                vec3d r     = nodes[i][j][k].loc;
+                vec3d vE    = nodes[i][j][k].E;
+                vec3d vGrad = nodes[i][j][k].grad;
                 vec3d vDiff = vE + vGrad;
-                vec3d vB    = nodes[i][j][k].getB();
+                vec3d vB    = nodes[i][j][k].B;
                 points->InsertNextPoint(r.x, r.y, r.z);
 
                 double Et[3] = {vE.x, vE.y, vE.z};
@@ -155,7 +153,7 @@ void CalcMesh::snapshot(std::string name) const {
                 double Bt[3] = {vB.x, vB.y, vB.z};
                 B->InsertNextTuple(Bt);
 
-                phi->InsertNextValue(nodes[i][j][k].getPhi());
+                phi->InsertNextValue(nodes[i][j][k].phi);
 
                 double _grad[3] = {-vGrad.x, -vGrad.y, -vGrad.z};
                 grad->InsertNextTuple(_grad);
@@ -261,9 +259,9 @@ void CalcMesh::snapshot(std::string                          name,
     for (unsigned int i = 0; i < nx; ++i) {
         for (unsigned int j = 0; j < ny; ++j) {
             for (unsigned int k = 0; k < nz; ++k) {
-                vec3d r = nodes[i][j][k].getLoc();
-                vec3d E = nodes[i][j][k].getE();
-                vec3d B = nodes[i][j][k].getB();
+                vec3d r = nodes[i][j][k].loc;
+                vec3d E = nodes[i][j][k].E;
+                vec3d B = nodes[i][j][k].B;
 
                 mesh_points->InsertNextPoint(r.x, r.y, r.z);
 
