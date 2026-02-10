@@ -1,0 +1,22 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "dev",
+      "binaryDir": "${sourceDir}/build",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_COMPILE_WARNING_AS_ERROR": true
+      }
+    },
+    {
+      "name": "dev-unix",
+      "inherits": ["dev"],
+      "hidden": false,
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "-Werror -Wall -Wextra -pedantic -Wno-self-assign -Wconversion -Wsign-conversion -Wunused -Wno-missing-field-initializers"
+      }
+    }
+  ]
+}
