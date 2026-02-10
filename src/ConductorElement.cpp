@@ -1,26 +1,19 @@
 #include "ConductorElement.h"
 
-void ConductorElement::setI(const vec3d& I_) { I = I_; }
+inline constexpr double k    = 9e9;
+inline constexpr double mupi = 1e-7;
 
-void ConductorElement::setQ(double q_) { q = q_; }
-
-vec3d ConductorElement::getLoc() const { return loc; }
-
-vec3d ConductorElement::getI() const { return I; }
-
-double ConductorElement::getQ() const { return q; }
-
-vec3d ConductorElement::calculateE(const vec3d& r) const {
+vec3d ConductorElement::E(const vec3d& r) const {
     double l = r.norm();
-    return (9e9 * q / (l * l * l)) * r;
+    return (k * q / (l * l * l)) * r;
 }
 
-vec3d ConductorElement::calculateB(const vec3d& r) const {
+vec3d ConductorElement::B(const vec3d& r) const {
     double l = r.norm();
-    return (1e-7 / (l * l * l)) * cross(I, r);
+    return (mupi / (l * l * l)) * cross(I, r);
 }
 
-double ConductorElement::calculatePhi(const vec3d& r) const {
+double ConductorElement::phi(const vec3d& r) const {
     double l = r.norm();
-    return 9e9 * q / l;
+    return k * q / l;
 }

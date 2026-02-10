@@ -2,7 +2,7 @@
 
 #include "vec3.h"
 
-struct CalcNode {
+struct Node {
     vec3d  loc;
     vec3d  E;     // Electric field
     vec3d  B;     // Magnetic field

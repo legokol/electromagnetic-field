@@ -33,6 +33,6 @@ public:
                   const std::vector<ConductorElement>& conductor) const;
 
 private:
-    std::vector<std::vector<std::vector<CalcNode>>> nodes;
-    double                                          h;
+    std::vector<std::vector<std::vector<Node>>> nodes;
+    double                                      h;
 };

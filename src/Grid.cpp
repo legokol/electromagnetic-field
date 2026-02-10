@@ -20,7 +20,7 @@ CalcMesh::CalcMesh(unsigned int size, double h) {
             for (unsigned int k = 0; k < size; ++k) {
                 // Позиция
                 vec3d loc(i * h, j * h, k * h);
-                nodes[i][j][k] = CalcNode(loc);
+                nodes[i][j][k] = Node(loc);
             }
         }
     }
@@ -39,7 +39,7 @@ CalcMesh::CalcMesh(unsigned int sizeX,
             for (unsigned int k = 0; k < sizeZ; ++k) {
                 // Позиция
                 vec3d loc(i * h, j * h, k * h);
-                nodes[i][j][k] = CalcNode(loc);
+                nodes[i][j][k] = Node(loc);
             }
         }
     }
@@ -49,11 +49,11 @@ void CalcMesh::calculate(const ConductorElement& element) {
     for (unsigned int i = 0; i < nodes.size(); ++i) {
         for (unsigned int j = 0; j < nodes[i].size(); ++j) {
             for (unsigned int k = 0; k < nodes[i][j].size(); ++k) {
-                vec3d r = nodes[i][j][k].loc - element.getLoc();
+                vec3d r = nodes[i][j][k].loc - element.loc;
                 if (abs(r.x) > 0 || abs(r.y) > 0 || abs(r.z) > 0) {
-                    nodes[i][j][k].E   = element.calculateE(r);
-                    nodes[i][j][k].B   = element.calculateB(r);
-                    nodes[i][j][k].phi = element.calculatePhi(r);
+                    nodes[i][j][k].E   = element.E(r);
+                    nodes[i][j][k].B   = element.B(r);
+                    nodes[i][j][k].phi = element.phi(r);
                 }
             }
             cout << "Nodes calculated: "
@@ -68,14 +68,12 @@ void CalcMesh::calculate(const std::vector<ConductorElement>& conductor) {
         for (unsigned int j = 0; j < nodes[i].size(); ++j) {
             for (unsigned int k = 0; k < nodes[i][j].size(); ++k) {
                 for (unsigned int s = 0; s < conductor.size(); ++s) {
-                    vec3d r = nodes[i][j][k].loc - conductor[s].getLoc();
+                    vec3d r = nodes[i][j][k].loc - conductor[s].loc;
                     if (abs(r.x) > 0 || abs(r.y) > 0 || abs(r.z) > 0) {
-                        nodes[i][j][k].E =
-                            nodes[i][j][k].E + conductor[s].calculateE(r);
-                        nodes[i][j][k].B =
-                            nodes[i][j][k].B + conductor[s].calculateB(r);
+                        nodes[i][j][k].E = nodes[i][j][k].E + conductor[s].E(r);
+                        nodes[i][j][k].B = nodes[i][j][k].B + conductor[s].B(r);
                         nodes[i][j][k].phi =
-                            nodes[i][j][k].phi + conductor[s].calculatePhi(r);
+                            nodes[i][j][k].phi + conductor[s].phi(r);
                     }
                 }
             }
@@ -211,8 +209,8 @@ void CalcMesh::snapshot(std::string                          name,
     conductor_B->SetNumberOfComponents(3);
 
     for (std::size_t i = 0; i < conductor.size(); ++i) {
-        vec3d r = conductor[i].getLoc();
-        vec3d I = conductor[i].getI();
+        vec3d r = conductor[i].loc;
+        vec3d I = conductor[i].I;
 
         conductor_points->InsertNextPoint(r.x, r.y, r.z);
 
