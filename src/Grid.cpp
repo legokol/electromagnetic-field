@@ -90,26 +90,24 @@ void CalcMesh::calculateGrad() {
     for (unsigned int i = 1; i < nodes.size() - 1; ++i) {
         for (unsigned int j = 1; j < nodes[i].size() - 1; ++j) {
             for (unsigned int k = 1; k < nodes[i][j].size() - 1; ++k) {
-                vec3d grad;
-                grad.x =
-                    (nodes[i + 1][j][k].getPhi() - nodes[i - 1][j][k].getPhi())
-                    / (2 * h);
-                grad.y =
-                    (nodes[i][j + 1][k].getPhi() - nodes[i][j - 1][k].getPhi())
-                    / (2 * h);
-                grad.z =
-                    (nodes[i][j][k + 1].getPhi() - nodes[i][j][k - 1].getPhi())
-                    / (2 * h);
-                nodes[i][j][k].setGrad(grad);
+                nodes[i][j][k].setGrad({.x = (nodes[i + 1][j][k].getPhi()
+                                              - nodes[i - 1][j][k].getPhi())
+                                           / (2 * h),
+                                        .y = (nodes[i][j + 1][k].getPhi()
+                                              - nodes[i][j - 1][k].getPhi())
+                                           / (2 * h),
+                                        .z = (nodes[i][j][k + 1].getPhi()
+                                              - nodes[i][j][k - 1].getPhi())
+                                           / (2 * h)});
             }
         }
     }
 }
 
 void CalcMesh::snapshot(std::string name) const {
-    unsigned int sizeX = nodes.size();
-    unsigned int sizeY = nodes[0].size();
-    unsigned int sizeZ = nodes[0][0].size();
+    const std::size_t nx = nodes.size();
+    const std::size_t ny = nodes[0].size();
+    const std::size_t nz = nodes[0][0].size();
 
     // Сетка в терминах VTK
     vtkSmartPointer<vtkStructuredGrid> structuredGrid =
@@ -141,9 +139,9 @@ void CalcMesh::snapshot(std::string name) const {
     diff->SetName("diff");
     diff->SetNumberOfComponents(3);
 
-    for (unsigned int i = 0; i < sizeX; ++i) {
-        for (unsigned int j = 0; j < sizeY; ++j) {
-            for (unsigned int k = 0; k < sizeZ; ++k) {
+    for (unsigned int i = 0; i < nx; ++i) {
+        for (unsigned int j = 0; j < ny; ++j) {
+            for (unsigned int k = 0; k < nz; ++k) {
                 vec3d r     = nodes[i][j][k].getLoc();
                 vec3d vE    = nodes[i][j][k].getE();
                 vec3d vGrad = nodes[i][j][k].getGrad();
@@ -151,11 +149,11 @@ void CalcMesh::snapshot(std::string name) const {
                 vec3d vB    = nodes[i][j][k].getB();
                 points->InsertNextPoint(r.x, r.y, r.z);
 
-                double _E[3] = {vE.x, vE.y, vE.z};
-                E->InsertNextTuple(_E);
+                double Et[3] = {vE.x, vE.y, vE.z};
+                E->InsertNextTuple(Et);
 
-                double _B[3] = {vB.x, vB.y, vB.z};
-                B->InsertNextTuple(_B);
+                double Bt[3] = {vB.x, vB.y, vB.z};
+                B->InsertNextTuple(Bt);
 
                 phi->InsertNextValue(nodes[i][j][k].getPhi());
 
@@ -172,7 +170,9 @@ void CalcMesh::snapshot(std::string name) const {
     }
 
     // Размер и точки сетки
-    structuredGrid->SetDimensions(sizeX, sizeY, sizeZ);
+    structuredGrid->SetDimensions(static_cast<int>(nx),
+                                  static_cast<int>(ny),
+                                  static_cast<int>(nz));
     structuredGrid->SetPoints(points);
 
     // Прикрепление данных
@@ -185,7 +185,7 @@ void CalcMesh::snapshot(std::string name) const {
     // Записываем
     vtkSmartPointer<vtkXMLStructuredGridWriter> writer =
         vtkSmartPointer<vtkXMLStructuredGridWriter>::New();
-    std::string fileName = name;
+    const std::string& fileName = name;
     writer->SetFileName(fileName.c_str());
     writer->SetInputData(structuredGrid);
     writer->Write();
@@ -212,20 +212,20 @@ void CalcMesh::snapshot(std::string                          name,
     conductor_B->SetName("B");
     conductor_B->SetNumberOfComponents(3);
 
-    for (int i = 0; i < conductor.size(); ++i) {
+    for (std::size_t i = 0; i < conductor.size(); ++i) {
         vec3d r = conductor[i].getLoc();
         vec3d I = conductor[i].getI();
 
         conductor_points->InsertNextPoint(r.x, r.y, r.z);
 
-        double _I[3] = {I.x, I.y, I.z};
-        conductor_I->InsertNextTuple(_I);
+        double It[3] = {I.x, I.y, I.z};
+        conductor_I->InsertNextTuple(It);
 
-        double _E[3] = {0, 0, 0};
-        conductor_E->InsertNextTuple(_E);
+        double Et[3] = {0, 0, 0};
+        conductor_E->InsertNextTuple(Et);
 
-        double _B[3] = {0, 0, 0};
-        conductor_B->InsertNextTuple(_B);
+        double Bt[3] = {0, 0, 0};
+        conductor_B->InsertNextTuple(Bt);
     }
 
     // Создание сетки для проводника
@@ -234,9 +234,9 @@ void CalcMesh::snapshot(std::string                          name,
     conductor_mesh->GetPointData()->AddArray(conductor_E);
     conductor_mesh->GetPointData()->AddArray(conductor_B);
 
-    unsigned int sizeX = nodes.size();
-    unsigned int sizeY = nodes[0].size();
-    unsigned int sizeZ = nodes[0][0].size();
+    const std::size_t nx = nodes.size();
+    const std::size_t ny = nodes[0].size();
+    const std::size_t nz = nodes[0][0].size();
 
     // Сетка в терминах VTK
     vtkSmartPointer<vtkStructuredGrid> mesh =
@@ -258,23 +258,23 @@ void CalcMesh::snapshot(std::string                          name,
     mesh_I->SetName("I");
     mesh_I->SetNumberOfComponents(3);
 
-    for (unsigned int i = 0; i < sizeX; ++i) {
-        for (unsigned int j = 0; j < sizeY; ++j) {
-            for (unsigned int k = 0; k < sizeZ; ++k) {
+    for (unsigned int i = 0; i < nx; ++i) {
+        for (unsigned int j = 0; j < ny; ++j) {
+            for (unsigned int k = 0; k < nz; ++k) {
                 vec3d r = nodes[i][j][k].getLoc();
                 vec3d E = nodes[i][j][k].getE();
                 vec3d B = nodes[i][j][k].getB();
 
                 mesh_points->InsertNextPoint(r.x, r.y, r.z);
 
-                double _E[3] = {E.x, E.y, E.z};
-                mesh_E->InsertNextTuple(_E);
+                double Et[3] = {E.x, E.y, E.z};
+                mesh_E->InsertNextTuple(Et);
 
-                double _B[3] = {B.x, B.y, B.z};
-                mesh_B->InsertNextTuple(_B);
+                double Bt[3] = {B.x, B.y, B.z};
+                mesh_B->InsertNextTuple(Bt);
 
-                double _I[3] = {0, 0, 0};
-                mesh_I->InsertNextTuple(_I);
+                double It[3] = {0, 0, 0};
+                mesh_I->InsertNextTuple(It);
             }
         }
         cout << "Nodes saved: "
@@ -283,7 +283,9 @@ void CalcMesh::snapshot(std::string                          name,
     }
 
     // Размер и точки сетки
-    mesh->SetDimensions(sizeX, sizeY, sizeZ);
+    mesh->SetDimensions(static_cast<int>(nx),
+                        static_cast<int>(ny),
+                        static_cast<int>(nz));
     mesh->SetPoints(mesh_points);
 
     // Прикрепление данных
@@ -300,7 +302,7 @@ void CalcMesh::snapshot(std::string                          name,
     // Записываем
     vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer =
         vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
-    std::string fileName = name;
+    const std::string& fileName = name;
     writer->SetFileName(fileName.c_str());
     writer->SetInputData(append->GetOutput());
     writer->Write();

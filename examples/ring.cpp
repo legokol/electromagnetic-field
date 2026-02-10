@@ -2,8 +2,8 @@
 #include "Grid.h"
 
 int main() {
-    int                           n = 100;
-    double                        h = 5;
+    const std::size_t             n = 100;
+    const double                  h = 5;
     std::vector<ConductorElement> ring;
     for (int i = 0; i < 8; ++i) {
         vec3d loc((n - 1) * h / 2 + cos(i * M_PI / 4) * h / 2,

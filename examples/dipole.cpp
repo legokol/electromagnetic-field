@@ -2,8 +2,8 @@
 #include "Grid.h"
 
 int main() {
-    int                           n      = 200;
-    double                        h      = 5;
+    const std::size_t             n      = 200;
+    const double                  h      = 5;
     std::vector<ConductorElement> dipole = {
         ConductorElement(
             vec3d((n - 1) * h / 2, (n - 1) * h / 2, (n - 1) * h / 2),

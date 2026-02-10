@@ -2,8 +2,8 @@
 #include "Grid.h"
 
 int main() {
-    int                           n = 100;
-    double                        h = 5;
+    const std::size_t             n = 100;
+    const double                  h = 5;
     std::vector<ConductorElement> solenoid;
     for (int j = 0; j < 11; ++j) {
         for (int i = 0; i < 8; ++i) {
