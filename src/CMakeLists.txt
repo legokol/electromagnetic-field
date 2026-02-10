@@ -1,5 +1,6 @@
 find_package(VTK REQUIRED COMPONENTS
     CommonCore
+    FiltersCore
     CommonDataModel
     IOXML
     # IOHDF

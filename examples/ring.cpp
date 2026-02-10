@@ -2,9 +2,9 @@
 #include "Grid.h"
 
 int main() {
-    int                      n = 100;
-    double                   h = 5;
-    vector<ConductorElement> ring;
+    int                           n = 100;
+    double                        h = 5;
+    std::vector<ConductorElement> ring;
     for (int i = 0; i < 8; ++i) {
         vector3D loc((n - 1) * h / 2 + cos(i * M_PI / 4) * h / 2,
                      (n - 1) * h / 2 + sin(i * M_PI / 4) * h / 2,
@@ -13,11 +13,11 @@ int main() {
         ring.push_back(ConductorElement(loc, I, 12.5));
     }
     CalcMesh mesh(n, h);
-    cout << "Initialization finished, starting calculation" << endl;
+    std::cout << "Initialization finished, starting calculation" << std::endl;
     mesh.calculate(ring);
     mesh.calculateGrad();
-    cout << "Calculation finished, starting saving" << endl;
+    std::cout << "Calculation finished, starting saving" << std::endl;
     mesh.snapshot("ring.vtu", ring);
-    cout << "Saving finished" << endl;
+    std::cout << "Saving finished" << std::endl;
     return 0;
 }

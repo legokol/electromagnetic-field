@@ -2,9 +2,9 @@
 #include "Grid.h"
 
 int main() {
-    int                      n      = 200;
-    double                   h      = 5;
-    vector<ConductorElement> dipole = {
+    int                           n      = 200;
+    double                        h      = 5;
+    std::vector<ConductorElement> dipole = {
         ConductorElement(
             vector3D((n - 1) * h / 2, (n - 1) * h / 2, (n - 1) * h / 2),
             vector3D(),
@@ -14,11 +14,11 @@ int main() {
             vector3D(),
             -100)};
     CalcMesh mesh(n, h);
-    cout << "Initialization finished, starting calculation" << endl;
+    std::cout << "Initialization finished, starting calculation" << std::endl;
     mesh.calculate(dipole);
     mesh.calculateGrad();
-    cout << "Calculation finished, starting saving" << endl;
+    std::cout << "Calculation finished, starting saving" << std::endl;
     mesh.snapshot("dipole.vts");
-    cout << "Saving finished" << endl;
+    std::cout << "Saving finished" << std::endl;
     return 0;
 }
