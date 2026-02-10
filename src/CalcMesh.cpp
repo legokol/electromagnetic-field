@@ -1,5 +1,15 @@
 #include "CalcMesh.h"
 
+#include <vtkAppendFilter.h>
+#include <vtkDoubleArray.h>
+#include <vtkPointData.h>
+#include <vtkPoints.h>
+#include <vtkSmartPointer.h>
+#include <vtkStructuredGrid.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkXMLStructuredGridWriter.h>
+#include <vtkXMLUnstructuredGridWriter.h>
+
 CalcMesh::CalcMesh(unsigned int size, double h) {
     this->h = h;
     nodes.resize(size);
@@ -16,7 +26,10 @@ CalcMesh::CalcMesh(unsigned int size, double h) {
     }
 }
 
-CalcMesh::CalcMesh(unsigned int sizeX, unsigned int sizeY, unsigned int sizeZ, double h) {
+CalcMesh::CalcMesh(unsigned int sizeX,
+                   unsigned int sizeY,
+                   unsigned int sizeZ,
+                   double       h) {
     this->h = h;
     nodes.resize(sizeX);
     for (unsigned int i = 0; i < sizeX; ++i) {
@@ -32,38 +45,46 @@ CalcMesh::CalcMesh(unsigned int sizeX, unsigned int sizeY, unsigned int sizeZ, d
     }
 }
 
-void CalcMesh::calculate(const ConductorElement &element) {
+void CalcMesh::calculate(const ConductorElement& element) {
     for (unsigned int i = 0; i < nodes.size(); ++i) {
         for (unsigned int j = 0; j < nodes[i].size(); ++j) {
             for (unsigned int k = 0; k < nodes[i][j].size(); ++k) {
                 vector3D r = nodes[i][j][k].getLoc() - element.getLoc();
-                if (abs(r.getX()) > 0 || abs(r.getY()) > 0 || abs(r.getZ()) > 0) {
+                if (abs(r.getX()) > 0 || abs(r.getY()) > 0
+                    || abs(r.getZ()) > 0) {
                     nodes[i][j][k].setE(element.calculateE(r));
                     nodes[i][j][k].setB(element.calculateB(r));
                     nodes[i][j][k].setPhi(element.calculatePhi(r));
                 }
             }
-            cout << "Nodes calculated: " << (i + 1) * nodes[0].size() * nodes[0][0].size() << " out of "
+            cout << "Nodes calculated: "
+                 << (i + 1) * nodes[0].size() * nodes[0][0].size() << " out of "
                  << nodes.size() * nodes[0].size() * nodes[0][0].size() << endl;
         }
     }
 }
 
-void CalcMesh::calculate(const vector<ConductorElement> &conductor) {
+void CalcMesh::calculate(const std::vector<ConductorElement>& conductor) {
     for (unsigned int i = 0; i < nodes.size(); ++i) {
         for (unsigned int j = 0; j < nodes[i].size(); ++j) {
             for (unsigned int k = 0; k < nodes[i][j].size(); ++k) {
                 for (unsigned int s = 0; s < conductor.size(); ++s) {
-                    vector3D r = nodes[i][j][k].getLoc() - conductor[s].getLoc();
-                    if (abs(r.getX()) > 0 || abs(r.getY()) > 0 || abs(r.getZ()) > 0) {
-                        nodes[i][j][k].setE(nodes[i][j][k].getE() + conductor[s].calculateE(r));
-                        nodes[i][j][k].setB(nodes[i][j][k].getB() + conductor[s].calculateB(r));
-                        nodes[i][j][k].setPhi(nodes[i][j][k].getPhi() + conductor[s].calculatePhi(r));
+                    vector3D r =
+                        nodes[i][j][k].getLoc() - conductor[s].getLoc();
+                    if (abs(r.getX()) > 0 || abs(r.getY()) > 0
+                        || abs(r.getZ()) > 0) {
+                        nodes[i][j][k].setE(nodes[i][j][k].getE()
+                                            + conductor[s].calculateE(r));
+                        nodes[i][j][k].setB(nodes[i][j][k].getB()
+                                            + conductor[s].calculateB(r));
+                        nodes[i][j][k].setPhi(nodes[i][j][k].getPhi()
+                                              + conductor[s].calculatePhi(r));
                     }
                 }
             }
         }
-        cout << "Nodes calculated: " << (i + 1) * nodes[0].size() * nodes[0][0].size() << " out of "
+        cout << "Nodes calculated: "
+             << (i + 1) * nodes[0].size() * nodes[0][0].size() << " out of "
              << nodes.size() * nodes[0].size() * nodes[0][0].size() << endl;
     }
 }
@@ -73,9 +94,15 @@ void CalcMesh::calculateGrad() {
         for (unsigned int j = 1; j < nodes[i].size() - 1; ++j) {
             for (unsigned int k = 1; k < nodes[i][j].size() - 1; ++k) {
                 vector3D grad;
-                grad.setX((nodes[i + 1][j][k].getPhi() - nodes[i - 1][j][k].getPhi()) / (2 * h));
-                grad.setY((nodes[i][j + 1][k].getPhi() - nodes[i][j - 1][k].getPhi()) / (2 * h));
-                grad.setZ((nodes[i][j][k + 1].getPhi() - nodes[i][j][k - 1].getPhi()) / (2 * h));
+                grad.setX(
+                    (nodes[i + 1][j][k].getPhi() - nodes[i - 1][j][k].getPhi())
+                    / (2 * h));
+                grad.setY(
+                    (nodes[i][j + 1][k].getPhi() - nodes[i][j - 1][k].getPhi())
+                    / (2 * h));
+                grad.setZ(
+                    (nodes[i][j][k + 1].getPhi() - nodes[i][j][k - 1].getPhi())
+                    / (2 * h));
                 nodes[i][j][k].setGrad(grad);
             }
         }
@@ -88,7 +115,8 @@ void CalcMesh::snapshot(std::string name) const {
     unsigned int sizeZ = nodes[0][0].size();
 
     // Сетка в терминах VTK
-    vtkSmartPointer<vtkStructuredGrid> structuredGrid = vtkSmartPointer<vtkStructuredGrid>::New();
+    vtkSmartPointer<vtkStructuredGrid> structuredGrid =
+        vtkSmartPointer<vtkStructuredGrid>::New();
     // Точки сетки в терминах VTK
     vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
 
@@ -119,11 +147,11 @@ void CalcMesh::snapshot(std::string name) const {
     for (unsigned int i = 0; i < sizeX; ++i) {
         for (unsigned int j = 0; j < sizeY; ++j) {
             for (unsigned int k = 0; k < sizeZ; ++k) {
-                vector3D r = nodes[i][j][k].getLoc();
-                vector3D vE = nodes[i][j][k].getE();
+                vector3D r     = nodes[i][j][k].getLoc();
+                vector3D vE    = nodes[i][j][k].getE();
                 vector3D vGrad = nodes[i][j][k].getGrad();
                 vector3D vDiff = vE + vGrad;
-                vector3D vB = nodes[i][j][k].getB();
+                vector3D vB    = nodes[i][j][k].getB();
                 points->InsertNextPoint(r.getX(), r.getY(), r.getZ());
 
                 double _E[3] = {vE.getX(), vE.getY(), vE.getZ()};
@@ -141,7 +169,8 @@ void CalcMesh::snapshot(std::string name) const {
                 diff->InsertNextTuple(_diff);
             }
         }
-        cout << "Nodes saved: " << (i + 1) * nodes[0].size() * nodes[0][0].size() << " out of "
+        cout << "Nodes saved: "
+             << (i + 1) * nodes[0].size() * nodes[0][0].size() << " out of "
              << nodes.size() * nodes[0].size() * nodes[0][0].size() << endl;
     }
 
@@ -157,17 +186,21 @@ void CalcMesh::snapshot(std::string name) const {
     structuredGrid->GetPointData()->AddArray(diff);
 
     // Записываем
-    vtkSmartPointer<vtkXMLStructuredGridWriter> writer = vtkSmartPointer<vtkXMLStructuredGridWriter>::New();
+    vtkSmartPointer<vtkXMLStructuredGridWriter> writer =
+        vtkSmartPointer<vtkXMLStructuredGridWriter>::New();
     std::string fileName = name;
     writer->SetFileName(fileName.c_str());
     writer->SetInputData(structuredGrid);
     writer->Write();
 }
 
-void CalcMesh::snapshot(std::string name, const vector<ConductorElement> &conductor) const {
+void CalcMesh::snapshot(std::string                          name,
+                        const std::vector<ConductorElement>& conductor) const {
     // Проводник
-    vtkSmartPointer<vtkUnstructuredGrid> conductor_mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-    vtkSmartPointer<vtkPoints> conductor_points = vtkSmartPointer<vtkPoints>::New();
+    vtkSmartPointer<vtkUnstructuredGrid> conductor_mesh =
+        vtkSmartPointer<vtkUnstructuredGrid>::New();
+    vtkSmartPointer<vtkPoints> conductor_points =
+        vtkSmartPointer<vtkPoints>::New();
 
     // Ток
     auto conductor_I = vtkSmartPointer<vtkDoubleArray>::New();
@@ -209,10 +242,10 @@ void CalcMesh::snapshot(std::string name, const vector<ConductorElement> &conduc
     unsigned int sizeZ = nodes[0][0].size();
 
     // Сетка в терминах VTK
-    vtkSmartPointer<vtkStructuredGrid> mesh = vtkSmartPointer<vtkStructuredGrid>::New();
+    vtkSmartPointer<vtkStructuredGrid> mesh =
+        vtkSmartPointer<vtkStructuredGrid>::New();
     // Точки сетки в терминах VTK
     vtkSmartPointer<vtkPoints> mesh_points = vtkSmartPointer<vtkPoints>::New();
-
 
     // Напряжённость электростатического поля
     auto mesh_E = vtkSmartPointer<vtkDoubleArray>::New();
@@ -247,7 +280,8 @@ void CalcMesh::snapshot(std::string name, const vector<ConductorElement> &conduc
                 mesh_I->InsertNextTuple(_I);
             }
         }
-        cout << "Nodes saved: " << (i + 1) * nodes[0].size() * nodes[0][0].size() << " out of "
+        cout << "Nodes saved: "
+             << (i + 1) * nodes[0].size() * nodes[0][0].size() << " out of "
              << nodes.size() * nodes[0].size() * nodes[0][0].size() << endl;
     }
 
@@ -260,13 +294,15 @@ void CalcMesh::snapshot(std::string name, const vector<ConductorElement> &conduc
     mesh->GetPointData()->AddArray(mesh_B);
     mesh->GetPointData()->AddArray(mesh_I);
 
-    vtkSmartPointer<vtkAppendFilter> append = vtkSmartPointer<vtkAppendFilter>::New();
+    vtkSmartPointer<vtkAppendFilter> append =
+        vtkSmartPointer<vtkAppendFilter>::New();
     append->AddInputData(mesh);
     append->AddInputData(conductor_mesh);
     append->Update();
 
     // Записываем
-    vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+    vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer =
+        vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
     std::string fileName = name;
     writer->SetFileName(fileName.c_str());
     writer->SetInputData(append->GetOutput());
