@@ -1,78 +1,31 @@
 #include "vec3.h"
+
 #include <cmath>
-#include <iostream>
+#include <numbers>
 
-using namespace std;
+namespace {
+constexpr double deg2rad(double x) { return x * std::numbers::pi / 180; }
+}  // namespace
 
-double vector3D::getX() const { return x; }
+double vec3d::norm() const { return std::sqrt(squaredNorm()); }
 
-double vector3D::getY() const { return y; }
-
-double vector3D::getZ() const { return z; }
-
-double vector3D::magnitude() const { return sqrt(x * x + y * y + z * z); }
-
-void vector3D::setX(double _x) { x = _x; }
-
-void vector3D::setY(double _y) { y = _y; }
-
-void vector3D::setZ(double _z) { z = _z; }
-
-void vector3D::rotateX(double angle) {
-    angle     = angle * 3.14 / 180;
-    double _y = getY(), _z = getZ();
-    setY(_y * cos(angle) + _z * sin(angle));
-    setZ(-_y * sin(angle) + _z * cos(angle));
+vec3d rotateX(const vec3d& v, double angle) noexcept {
+    angle          = deg2rad(angle);
+    const double s = std::sin(angle);
+    const double c = std::cos(angle);
+    return {.x = v.x, .y = v.y * c + v.z * s, .z = -v.y * s + v.z * c};
 }
-
-void vector3D::rotateY(double angle) {
-    angle     = angle * 3.14 / 180;
-    double _z = getZ(), _x = getX();
-    setZ(_z * cos(angle) + _x * sin(angle));
-    setX(-_z * sin(angle) + _x * cos(angle));
+// Поворачивает вектор вокруг оси Y (единичный вектор (0; 1; 0)) на угол angle, заданный в градусах
+vec3d rotateY(const vec3d& v, double angle) noexcept {
+    angle          = deg2rad(angle);
+    const double s = std::sin(angle);
+    const double c = std::cos(angle);
+    return {.x = -v.z * s + v.x * c, .y = v.y, .z = v.z * c + v.x * s};
 }
-
-void vector3D::rotateZ(double angle) {
-    angle     = angle * 3.14 / 180;
-    double _x = getX(), _y = getY();
-    setX(_x * cos(angle) + _y * sin(angle));
-    setY(-_x * sin(angle) + _y * cos(angle));
-}
-
-vector3D& vector3D::operator=(const vector3D& v) {
-    x = v.getX();
-    y = v.getY();
-    z = v.getZ();
-    return (*this);
-}
-
-bool vector3D::operator==(const vector3D& v2) const {
-    return x == v2.getX() && y == v2.getY();
-}
-
-bool vector3D::operator!=(const vector3D& v2) const { return !(*this == v2); }
-
-vector3D vector3D::operator+(const vector3D& v2) const {
-    return vector3D(x + v2.getX(), y + v2.getY(), z + v2.getZ());
-}
-
-vector3D vector3D::operator-(const vector3D& v2) const {
-    return vector3D(x - v2.getX(), y - v2.getY(), z - v2.getZ());
-}
-
-vector3D vector3D::operator*(double a) const {
-    return vector3D(x * a, y * a, z * a);
-}
-
-double vector3D::operator*(const vector3D& v2) const {
-    return x * v2.getX() + y * v2.getY() + z * v2.getZ();
-}
-
-vector3D operator*(double a, const vector3D& v) { return v * a; }
-
-vector3D crossProduct(const vector3D& v1, const vector3D& v2) {
-    double x = v1.getY() * v2.getZ() - v2.getY() * v1.getZ();
-    double y = v1.getZ() * v2.getX() - v2.getZ() * v1.getX();
-    double z = v1.getX() * v2.getY() - v2.getX() * v1.getY();
-    return vector3D(x, y, z);
+// Поворачивает вектор вокруг оси Z (единичный вектор (0; 0; 1)) на угол angle, заданный в градусах
+vec3d rotateZ(const vec3d& v, double angle) noexcept {
+    angle          = deg2rad(angle);
+    const double s = std::sin(angle);
+    const double c = std::cos(angle);
+    return {.x = v.x * c + v.y * s, .y = -v.x * s + v.y * c, .z = v.z};
 }

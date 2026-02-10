@@ -1,36 +1,26 @@
 #include "ConductorElement.h"
 
-void ConductorElement::setI(const vector3D &I_) {
-    I = I_;
-}
+void ConductorElement::setI(const vec3d& I_) { I = I_; }
 
-void ConductorElement::setQ(double q_) {
-    q = q_;
-}
+void ConductorElement::setQ(double q_) { q = q_; }
 
-vector3D ConductorElement::getLoc() const {
-    return loc;
-}
+vec3d ConductorElement::getLoc() const { return loc; }
 
-vector3D ConductorElement::getI() const {
-    return I;
-}
+vec3d ConductorElement::getI() const { return I; }
 
-double ConductorElement::getQ() const {
-    return q;
-}
+double ConductorElement::getQ() const { return q; }
 
-vector3D ConductorElement::calculateE(const vector3D &r) const {
-    double l = r.magnitude();
+vec3d ConductorElement::calculateE(const vec3d& r) const {
+    double l = r.norm();
     return (9e9 * q / (l * l * l)) * r;
 }
 
-vector3D ConductorElement::calculateB(const vector3D &r) const {
-    double l = r.magnitude();
-    return (1e-7 / (l * l * l)) * crossProduct(I, r);
+vec3d ConductorElement::calculateB(const vec3d& r) const {
+    double l = r.norm();
+    return (1e-7 / (l * l * l)) * cross(I, r);
 }
 
-double ConductorElement::calculatePhi(const vector3D &r) const {
-    double l = r.magnitude();
+double ConductorElement::calculatePhi(const vec3d& r) const {
+    double l = r.norm();
     return 9e9 * q / l;
 }

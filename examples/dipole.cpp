@@ -6,12 +6,12 @@ int main() {
     double                        h      = 5;
     std::vector<ConductorElement> dipole = {
         ConductorElement(
-            vector3D((n - 1) * h / 2, (n - 1) * h / 2, (n - 1) * h / 2),
-            vector3D(),
+            vec3d((n - 1) * h / 2, (n - 1) * h / 2, (n - 1) * h / 2),
+            vec3d(),
             100),
         ConductorElement(
-            vector3D((n + 1) * h / 2, (n - 1) * h / 2, (n - 1) * h / 2),
-            vector3D(),
+            vec3d((n + 1) * h / 2, (n - 1) * h / 2, (n - 1) * h / 2),
+            vec3d(),
             -100)};
     CalcMesh mesh(n, h);
     std::cout << "Initialization finished, starting calculation" << std::endl;

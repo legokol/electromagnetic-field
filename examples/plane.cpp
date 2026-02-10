@@ -11,7 +11,7 @@ int main() {
             double y = (n / 4 + j) * h;
             double z = (n - 1) * h / 2;
             plane[i * (n / 2) + j] =
-                ConductorElement(vector3D(x, y, z), vector3D(1, 0, 0), 1);
+                ConductorElement(vec3d(x, y, z), vec3d(1, 0, 0), 1);
         }
     }
     CalcMesh mesh(n, h);

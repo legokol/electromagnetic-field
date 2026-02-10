@@ -8,41 +8,38 @@ public:
     CalcNode() {}
 
     // Конструктор только с локацией
-    CalcNode(const vector3D& loc_) : loc(loc_), E(), B(), phi(0), grad() {}
+    CalcNode(const vec3d& loc_) : loc(loc_), E(), B(), phi(0), grad() {}
 
     // Конструктор с заданием всех параметров (а вдруг)
-    CalcNode(const vector3D& loc_,
-             const vector3D& E_,
-             const vector3D& B_,
-             double          p)
+    CalcNode(const vec3d& loc_, const vec3d& E_, const vec3d& B_, double p)
         : loc(loc_)
         , E(E_)
         , B(B_)
         , phi(p)
         , grad() {}
 
-    void setE(const vector3D& E_);
+    void setE(const vec3d& E_);
 
-    void setB(const vector3D& B_);
+    void setB(const vec3d& B_);
 
     void setPhi(double p);
 
-    void setGrad(const vector3D& g);
+    void setGrad(const vec3d& g);
 
-    vector3D getLoc() const;
+    vec3d getLoc() const;
 
-    vector3D getE() const;
+    vec3d getE() const;
 
-    vector3D getB() const;
+    vec3d getB() const;
 
     double getPhi() const;
 
-    vector3D getGrad() const;
+    vec3d getGrad() const;
 
 private:
-    vector3D loc;
-    vector3D E;     // Electric field
-    vector3D B;     // Magnetic field
-    double   phi;   // Electric potential
-    vector3D grad;  // Potential gradient
+    vec3d  loc;
+    vec3d  E;     // Electric field
+    vec3d  B;     // Magnetic field
+    double phi;   // Electric potential
+    vec3d  grad;  // Potential gradient
 };

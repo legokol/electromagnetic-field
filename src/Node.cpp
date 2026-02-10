@@ -1,19 +1,19 @@
 #include "Node.h"
 
-void CalcNode::setE(const vector3D& E_) { E = E_; }
+void CalcNode::setE(const vec3d& E_) { E = E_; }
 
-void CalcNode::setB(const vector3D& B_) { B = B_; }
+void CalcNode::setB(const vec3d& B_) { B = B_; }
 
 void CalcNode::setPhi(double p) { phi = p; }
 
-void CalcNode::setGrad(const vector3D& g) { grad = g; }
+void CalcNode::setGrad(const vec3d& g) { grad = g; }
 
-vector3D CalcNode::getLoc() const { return loc; }
+vec3d CalcNode::getLoc() const { return loc; }
 
-vector3D CalcNode::getE() const { return E; }
+vec3d CalcNode::getE() const { return E; }
 
-vector3D CalcNode::getB() const { return B; }
+vec3d CalcNode::getB() const { return B; }
 
 double CalcNode::getPhi() const { return phi; }
 
-vector3D CalcNode::getGrad() const { return grad; }
+vec3d CalcNode::getGrad() const { return grad; }

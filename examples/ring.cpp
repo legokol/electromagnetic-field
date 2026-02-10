@@ -6,10 +6,10 @@ int main() {
     double                        h = 5;
     std::vector<ConductorElement> ring;
     for (int i = 0; i < 8; ++i) {
-        vector3D loc((n - 1) * h / 2 + cos(i * M_PI / 4) * h / 2,
-                     (n - 1) * h / 2 + sin(i * M_PI / 4) * h / 2,
-                     (n - 1) * h / 2);
-        vector3D I(-sin(i * M_PI / 4), cos(i * M_PI / 4), 0);
+        vec3d loc((n - 1) * h / 2 + cos(i * M_PI / 4) * h / 2,
+                  (n - 1) * h / 2 + sin(i * M_PI / 4) * h / 2,
+                  (n - 1) * h / 2);
+        vec3d I(-sin(i * M_PI / 4), cos(i * M_PI / 4), 0);
         ring.push_back(ConductorElement(loc, I, 12.5));
     }
     CalcMesh mesh(n, h);
