@@ -12,7 +12,7 @@ int main() {
         vec3d I(-sin(i * M_PI / 4), cos(i * M_PI / 4), 0);
         ring.push_back(ConductorElement(loc, I, 12.5));
     }
-    CalcMesh mesh(n, h);
+    Grid mesh(n, h);
     std::cout << "Initialization finished, starting calculation" << std::endl;
     mesh.calculate(ring);
     mesh.calculateGrad();

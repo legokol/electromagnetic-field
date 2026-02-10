@@ -15,7 +15,7 @@ int main() {
                                  1);
         }
     }
-    CalcMesh mesh(n, h);
+    Grid mesh(n, h);
     std::cout << "Initialization finished, starting calculation" << std::endl;
     mesh.calculate(plane);
     mesh.calculateGrad();

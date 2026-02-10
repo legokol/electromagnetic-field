@@ -14,7 +14,7 @@ int main() {
             solenoid.push_back(ConductorElement(loc, I, 12.5));
         }
     }
-    CalcMesh mesh(n, h);
+    Grid mesh(n, h);
     std::cout << "Initialization finished, starting calculation" << std::endl;
     mesh.calculate(solenoid);
     mesh.calculateGrad();
