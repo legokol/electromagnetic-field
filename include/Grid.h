@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "CalcNode.h"
 #include "ConductorElement.h"
+#include "Node.h"
 
 class CalcMesh {
 public:

@@ -4,8 +4,8 @@ target_sources(${PROJECT_NAME} PUBLIC
     FILE_SET publicHeaders
     TYPE HEADERS
     FILES
-    CalcMesh.h
-    CalcNode.h
+    Grid.h
+    Node.h
     ConductorElement.h
     vec3.h
 )

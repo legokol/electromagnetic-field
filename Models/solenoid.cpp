@@ -1,13 +1,14 @@
 #include <iostream>
-#include "CalcMesh.h"
+#include "Grid.h"
 
 int main() {
-    int n = 100;
-    double h = 5;
+    int                      n = 100;
+    double                   h = 5;
     vector<ConductorElement> solenoid;
     for (int j = 0; j < 11; ++j) {
         for (int i = 0; i < 8; ++i) {
-            vector3D loc((n - 1) * h / 2 + cos(i * M_PI / 4) * h / 2, (n - 1) * h / 2 + sin(i * M_PI / 4) * h / 2,
+            vector3D loc((n - 1) * h / 2 + cos(i * M_PI / 4) * h / 2,
+                         (n - 1) * h / 2 + sin(i * M_PI / 4) * h / 2,
                          (n - 1) * h / 2 + (j - 5) * h);
             vector3D I(-sin(i * M_PI / 4), cos(i * M_PI / 4), 0);
             solenoid.push_back(ConductorElement(loc, I, 12.5));

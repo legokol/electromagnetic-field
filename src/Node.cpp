@@ -1,4 +1,4 @@
-#include "CalcNode.h"
+#include "Node.h"
 
 void CalcNode::setE(const vector3D& E_) { E = E_; }
 
