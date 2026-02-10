@@ -82,40 +82,39 @@ namespace {
     std::size_t              ny,
     std::size_t              nz,
     const std::vector<Node>& nodes) {
-    // Сетка в терминах VTK
-    vtkSmartPointer<vtkStructuredGrid> structuredGrid =
-        vtkSmartPointer<vtkStructuredGrid>::New();
     // Точки сетки в терминах VTK
-    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+    const auto                 vtkSize = static_cast<vtkIdType>(nodes.size());
+    vtkSmartPointer<vtkPoints> points  = vtkSmartPointer<vtkPoints>::New();
+    points->SetNumberOfPoints(vtkSize);
 
     // Потенциал
     auto phi = vtkSmartPointer<vtkDoubleArray>::New();
     phi->SetName("phi");
-    phi->SetNumberOfValues(static_cast<vtkIdType>(nodes.size()));
+    phi->SetNumberOfValues(vtkSize);
 
     // Напряжённость электростатического поля
     auto E = vtkSmartPointer<vtkDoubleArray>::New();
     E->SetName("E");
     E->SetNumberOfComponents(3);
-    E->SetNumberOfTuples(static_cast<vtkIdType>(nodes.size()));
+    E->SetNumberOfTuples(vtkSize);
 
     // Индукция магнитного поля
     auto B = vtkSmartPointer<vtkDoubleArray>::New();
     B->SetName("B");
     B->SetNumberOfComponents(3);
-    B->SetNumberOfTuples(static_cast<vtkIdType>(nodes.size()));
+    B->SetNumberOfTuples(vtkSize);
 
     // Градиент потенциала
     auto grad = vtkSmartPointer<vtkDoubleArray>::New();
     grad->SetName("grad");
     grad->SetNumberOfComponents(3);
-    grad->SetNumberOfTuples(static_cast<vtkIdType>(nodes.size()));
+    grad->SetNumberOfTuples(vtkSize);
 
     // Разница градиента и электростатического поля
     auto diff = vtkSmartPointer<vtkDoubleArray>::New();
     diff->SetName("diff");
     diff->SetNumberOfComponents(3);
-    diff->SetNumberOfTuples(static_cast<vtkIdType>(nodes.size()));
+    diff->SetNumberOfTuples(vtkSize);
 
     for (std::size_t i = 0; i < nodes.size(); ++i) {
         const auto& [r, vE, vB, vPhi, vGrad] = nodes[i];
@@ -144,6 +143,8 @@ namespace {
                      << nodes.size() * nodes[0].size() * nodes[0][0].size() << endl;
 #endif
 
+    // Сетка в терминах VTK
+    auto structuredGrid = vtkSmartPointer<vtkStructuredGrid>::New();
     // Размер и точки сетки
     structuredGrid->SetDimensions(static_cast<int>(nx),
                                   static_cast<int>(ny),
@@ -174,27 +175,26 @@ void Grid::snapshot(const std::filesystem::path& path) const {
 
 void Grid::snapshot(const std::filesystem::path&         path,
                     const std::vector<ConductorElement>& conductor) const {
-    // Проводник
-    vtkSmartPointer<vtkUnstructuredGrid> cGrid =
-        vtkSmartPointer<vtkUnstructuredGrid>::New();
+    const auto                 cSize = static_cast<vtkIdType>(conductor.size());
     vtkSmartPointer<vtkPoints> cPoints = vtkSmartPointer<vtkPoints>::New();
+    cPoints->SetNumberOfPoints(cSize);
 
     // Ток
     auto cI = vtkSmartPointer<vtkDoubleArray>::New();
     cI->SetName("I");
     cI->SetNumberOfComponents(3);
-    cI->SetNumberOfTuples(static_cast<vtkIdType>(conductor.size()));
+    cI->SetNumberOfTuples(cSize);
 
     auto cE = vtkSmartPointer<vtkDoubleArray>::New();
     cE->SetName("E");
     cE->SetNumberOfComponents(3);
-    cE->SetNumberOfTuples(static_cast<vtkIdType>(conductor.size()));
+    cE->SetNumberOfTuples(cSize);
     cE->Fill(0);
 
     auto cB = vtkSmartPointer<vtkDoubleArray>::New();
     cB->SetName("B");
     cB->SetNumberOfComponents(3);
-    cB->SetNumberOfTuples(static_cast<vtkIdType>(conductor.size()));
+    cB->SetNumberOfTuples(cSize);
     cB->Fill(0);
 
     for (std::size_t i = 0; i < conductor.size(); ++i) {
@@ -206,6 +206,9 @@ void Grid::snapshot(const std::filesystem::path&         path,
         cI->SetTuple(idx, It);
     }
 
+    // Проводник
+    vtkSmartPointer<vtkUnstructuredGrid> cGrid =
+        vtkSmartPointer<vtkUnstructuredGrid>::New();
     // Создание сетки для проводника
     cGrid->SetPoints(cPoints);
     cGrid->GetPointData()->AddArray(cI);
